@@ -19,6 +19,10 @@ step3-harness   → skills + subagents + harness（全部入り）
 
 各ブランチは前のブランチの延長です。順番に `git checkout` して違いを体験してください。
 
+**重要:** ブランチを切り替えたら、**Claude Code を再起動**してください。
+Skills はセッション起動時にロードされるため、ブランチ切り替え後に再起動しないと新しい skills が反映されません。
+参考: [Agent Skills - Claude Code Docs](https://code.claude.com/docs/en/skills)
+
 ---
 
 ## main（このブランチ）: 素のClaude Code
