@@ -1,0 +1,135 @@
+> The "pr-review" skill is running 
+
+⏺ PR レビューを開始します。現在のブランチとステージング済みの変更を確認します。
+
+⏺ Bash(git status)
+  ⎿  On branch step1-skills                             
+     Changes to be committed:
+       (use "git restore --staged <file>..." to unstage)
+     … +11 lines (ctrl+o to expand)
+
+⏺ Bash(git diff --cached)
+  ⎿  diff --git a/.claude/skills/pr-review/SKILL.md b/.claude/skills/pr-review/SKILL.md
+     new file mode 100644
+     index 0000000..4629f1d
+     … +58 lines (ctrl+o to expand)
+
+⏺ Bash(git log -1 --format='%H %s')
+  ⎿  8cff82e72153228aeb5e558bed6b11f7cf47d89f docs: 全体プラン・ブランチ構成を README に記載
+
+⏺ ステージング済みの変更を確認しました。次に README.md の変更内容も確認します。
+
+⏺ Bash(git diff README.md)
+  ⎿  diff --git a/README.md b/README.md
+     index 6a86d99..ace100d 100644
+     --- a/README.md
+     … +12 lines (ctrl+o to expand)
+
+⏺ 全体の変更内容を把握できました。レビューを実施します。
+
+  ---
+  要約 (Summary)
+
+  このPRでは、PR レビュースキル（.claude/skills/pr-review/）を新規追加し、README にブランチ切り替え時の注意事項（Claude Code 再起動の必要性）を追記しています。
+
+  主な変更:
+  - SKILL.md: 日本語で構造化レビューを行うスキル定義（user-invocable 対応）
+  - checklist.md: レビュー観点のチェックリスト（正確性、リスク、保守性、テスト）
+  - README.md: Skills がセッション起動時にロードされる仕様を補足
+
+  ---
+  Must-fix
+
+  なし – 致命的な問題は見当たりません。
+
+  ---
+  リスク / edge cases
+
+  1. スキルのスコープ制限 (allowed-tools)
+
+  .claude/skills/pr-review/SKILL.md:4
+  allowed-tools: Read, Grep, Glob
+
+  リスク: PR レビュー時に git diff や Bash を実行できないため、diff 取得や commit log 確認ができません。現在のスキル実装では、呼び出し元（メインセッション）で git diff --cached を事前実行していることを前提としていますが、スキル単体では不完全です。
+
+  推奨: 以下のいずれか:
+  - allowed-tools に Bash を追加（git コマンド実行可能に）
+  - スキル説明に「事前に diff を取得してから実行すること」を明記
+
+  2. 日本語出力の強制
+
+  SKILL.md:10
+  **必ず日本語で出力すること。**
+
+  想定問題:
+  - 英語コードベースや国際チームでは不便
+  - スキル自体は汎用的だが、言語が固定されている
+
+  提案: パラメータで言語を切り替え可能にするか、別名で英語版を用意
+
+  3. README の変更がステージングされていない
+
+  README.md の変更は有用ですが、staged に含まれていません。意図的であれば問題ありませんが、この PR に含めるべきか確認が必要です。
+
+  ---
+  保守性 (Maintainability)
+
+  ✅ 良い点
+
+  - 明確な出力契約: 6つのセクションを定義し、レビューの一貫性を確保
+  - ファイル分離: スキル定義とチェックリストを分離し、メンテナンスしやすい構造
+  - user-invocable 対応: /pr-review でユーザーから直接呼び出し可能
+
+  ⚠️ 改善提案
+
+  - checklist.md の参照タイミングが曖昧
+  SKILL.md:27 では「詳細が必要な場合のみ参照」とありますが、実際にいつ読むべきか（LLM 判断？必須？）が不明瞭。スキル内で明示的に読み込むか、オプション扱いか整理を推奨。
+  - ファイル/行番号の記載ルール
+  「可能な限りファイル/行番号を含める」とありますが、diff から自動抽出するのか、手動記載なのかが不明。例を追加すると良いでしょう。
+
+  ---
+  テスト (Testing)
+
+  実施済み
+
+  - （このレビュー自体がスキルの動作テストを兼ねています）
+
+  追加すべきテスト
+
+  1. スキルの動作確認
+    - ステージング済み変更がある状態で /pr-review を実行
+    - 出力が 6 セクション構造に従っているか検証
+  2. エッジケース
+    - ステージング済み変更がない場合の挙動
+    - 大量の diff がある場合のトークン制限対応
+  3. README 変更の検証
+    - ブランチ切り替え → Claude Code 再起動 → Skills が反映されるか確認
+
+  ---
+  提案事項 (Suggested follow-ups)
+
+  1. allowed-tools に Bash を追加
+
+  - allowed-tools: Read, Grep, Glob
+  + allowed-tools: Read, Grep, Glob, Bash
+  これにより、スキル内で git diff --cached や git log を実行可能になります。
+
+  2. README 変更をステージング
+
+  有用な情報なので、この PR に含めることを推奨:
+  git add README.md
+
+  3. 使用例の追加
+
+  SKILL.md または README.md に実行例を追加:
+  ## 使い方
+  1. 変更を stage: `git add .`
+  2. レビュー実行: `/pr-review`
+  3. 出力された Must-fix を修正後、再レビュー
+
+  4. 多言語対応の検討
+
+  将来的に英語版 pr-review-en を用意するか、パラメータ化を検討。
+
+  ---
+  総合評価: 良く設計されたスキルです。allowed-tools の制限と README のステージング状況を確認すれば、すぐにマージ可能です。
