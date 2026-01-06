@@ -1,0 +1,8 @@
+claude-progress.txt
+==================
+Purpose: セッションまたぎの引き継ぎログ（harness）。
+
+[INIT] 2026-01-05 (UTC)
+- Repo created for webinar demo.
+- Known issue: divide(1, 0) should raise ValueError but does not.
+- Next: Use test-runner subagent to fix failing unit test, then update feature_list.json passes for that feature.

@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.DS_Store
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# Claude Code / KAMUI (3D visualization tool state)
+.kamui/
+
+# Claude Code local settings (user-specific, should not be shared)
+.claude/settings.local.json
