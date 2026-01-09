@@ -13,3 +13,6 @@ __pycache__/
 
 # Claude Code local settings (user-specific, should not be shared)
 .claude/settings.local.json
+
+# Git worktrees for parallel development
+.worktrees/
