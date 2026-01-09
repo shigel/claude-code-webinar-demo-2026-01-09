@@ -1,0 +1,192 @@
+
+> このブランチをPRレビューして 
+
+⏺ 現在のブランチは main ですが、PRレビューを行うには、どのブランチをレビューするか確認させてください。
+
+  まず、利用可能なブランチを確認します。
+
+⏺ Bash(git branch -a)
+  ⎿  * main        
+       step1-skills
+
+⏺ 利用可能なブランチは以下の2つです：
+  - main（現在のブランチ）
+  - step1-skills
+
+  どのブランチをレビューしますか？
+                                                                
+⏺ User answered Claude's questions:
+  ⎿  · どのブランチをレビューしますか？ → main（最近のコミット）
+
+⏺ 了解しました。mainブランチの最近のコミットをレビューします。何個のコミットをレビューしますか？
+                                                            
+⏺ User answered Claude's questions:
+  ⎿  · 何個の最近のコミットをレビューしますか？ → 全体の状態
+
+⏺ 了解しました。mainブランチ全体の状態をレビューします。まず、プロジェクトの構造を把握します。
+
+⏺ Bash(find . -type f -name "*.ts" -o -name "*.js" -o -name "*.json" -o -name "*.md" | grep -v node_modules | head -30)
+  ⎿  ./.kamui/system-graph-state.json
+     ./.claude/settings.local.json
+     ./docs/webinar_runbook_10min.md
+     ./README.md
+
+⏺ Read(README.md)
+  ⎿  Read 197 lines
+
+⏺ Read(package.json)
+  ⎿  Error reading file
+
+⏺ Bash(ls -la)
+  ⎿  total 40                                                   
+     drwxr-xr-x@  11 saito.t-kst.com  staff   352  1  6 17:17 .
+     drwxr-xr-x  168 saito.t-kst.com  staff  5376  1  6 10:16 ..
+     … +9 lines (ctrl+o to expand)
+
+⏺ Bash(find . -name "*.py" | grep -v __pycache__)
+  ⎿  ./tests/__init__.py       
+     ./tests/test_calculator.py
+     ./src/__init__.py
+     ./src/calculator.py
+
+⏺ Read(src/calculator.py)
+  ⎿  Read 30 lines
+
+⏺ Read(tests/test_calculator.py)
+  ⎿  Read 26 lines
+
+⏺ Read(.gitignore)
+  ⎿  Read 16 lines
+
+⏺ Bash(ls -la .claude/)
+  ⎿  total 8                                                                   
+     drwxr-xr-x@  3 saito.t-kst.com  staff   96  1  6 16:52 .
+     drwxr-xr-x@ 11 saito.t-kst.com  staff  352  1  6 17:17 ..
+     -rw-------@  1 saito.t-kst.com  staff   77  1  6 15:07 settings.local.json
+
+⏺ Bash(ls -la docs/)
+  ⎿  total 120                                                  
+     drwxr-xr-x@  4 saito.t-kst.com  staff    128  1  6 11:53 .
+     drwxr-xr-x@ 11 saito.t-kst.com  staff    352  1  6 17:17 ..
+     … +2 lines (ctrl+o to expand)
+
+⏺ Bash(python -m unittest -q 2>&1)
+  ⎿  Error: Exit code 1
+     ======================================================================
+     FAIL: test_divide_by_zero_raises (tests.test_calculator.TestCalculator.test_divide_by_zero_raises)
+     ----------------------------------------------------------------------
+     Traceback (most recent call last):
+       File "/Users/saito.t-kst.com/git/shigel/claude-code-webinar-demo-2026-01-09/tests/test_calculator.py", line 20, in test_divide_by_zero_raises
+         with self.assertRaises(ValueError):
+     AssertionError: ValueError not raised
+
+     ----------------------------------------------------------------------
+     … +3 lines (ctrl+o to see all)
+
+⏺ Read(.claude/settings.local.json)
+  ⎿  Read 8 lines
+
+⏺ Read(docs/webinar_runbook_10min.md)
+  ⎿  Read 19 lines
+
+⏺ Bash(git log --oneline -10)
+  ⎿  aa38b5c docs: ブランチ切り替え時の Claude Code 再起動に関する注意事項を追加
+     8cff82e docs: 全体プラン・ブランチ構成を README に記載
+     932c4f3 refactor: mainを素のClaude Code状態にする
+     … +2 lines (ctrl+o to expand)
+
+⏺ mainブランチ PRレビュー
+
+  概要
+
+  Claude Code ウェビナー用のデモリポジトリです。Skills、Subagents、Harnessを段階的に学習するための教育的なプロジェクトで、現在のmainブランチは「素のClaude Code」状態を示しています。
+
+  プロジェクト構成
+
+  src/calculator.py        - シンプルな計算機モジュール（意図的なバグあり）
+  tests/test_calculator.py - ユニットテスト（1つ失敗）
+  README.md                - 明確なプロジェクト説明とブランチ構成
+  docs/                    - ウェビナー資料
+  .claude/                 - Claude Code設定
+
+  発見事項
+
+  1. 意図的なバグ（デモ用）
+
+  src/calculator.py:26-27
+
+  if b == 0:
+      return 0  # BUG: should raise ValueError
+
+  - テストtest_divide_by_zero_raisesが失敗（ValueError期待だが0が返る）
+  - コメントで明示されており、デモの意図通り
+  - 実行結果: FAILED (failures=1)
+
+  2. ドキュメント品質
+
+  強み:
+  - README.mdが非常に分かりやすい
+    - 各ブランチの目的が明確（main → step1 → step2 → step3）
+    - デモ手順が具体的
+    - 重要な注意事項（ブランチ切り替え時の再起動）を強調
+  - ウェビナー台本も整備されている
+
+  改善余地:
+  - Pythonのバージョン要件が"3.x"と曖昧（3.8+など具体的に）
+  - requirementsやpyproject.tomlがなく、依存関係が不明確
+
+  3. 設定ファイル
+
+  .claude/settings.local.json:
+  {
+    "permissions": {
+      "allow": ["Bash(git checkout:*)"]
+    }
+  }
+  - git checkoutのみ許可（デモ用に適切）
+  - ユーザー固有設定として.gitignore登録済み（正しい）
+
+  .gitignore:
+  - 標準的なPython除外設定
+  - Claude Code関連も適切に除外
+
+  4. コード品質
+
+  src/calculator.py:
+  - 型ヒント完備（from future import annotations）
+  - 関数がシンプルで理解しやすい
+  - docstringは divide() のみ（教育用として十分）
+
+  tests/test_calculator.py:
+  - 基本的なテストケースを網羅
+  - ゼロ除算のエラーケースもテスト
+  - テストの命名が明確
+
+  5. Git履歴
+
+  最近のコミット:
+  - aa38b5c - ブランチ切り替え時の再起動注意を追加（重要な改善）
+  - 8cff82e - READMEにプラン・ブランチ構成を追加
+  - 932c4f3 - mainを素のClaude Code状態にリファクタリング
+
+  一貫したコミットメッセージ形式（prefix: description）
+
+  推奨事項
+
+  1. 依存関係管理の追加
+    - requirements.txtまたはpyproject.tomlを追加
+    - Pythonバージョンを明示（例: >=3.8）
+  2. テスト実行コマンドの統一化
+    - Makefileやtox.iniでテストコマンドを標準化
+    - READMEに既にpython -m unittest -qが記載されているが、CI/CD想定ならtoxなども検討
+  3. ウェビナー後のフォローアップ
+    - step1-skills、step2-subagents、step3-harnessブランチの内容も確認
+    - 各ブランチ間の差分が明確かチェック
+
+  総評
+
+  評価: ★★★★☆ (4/5)
+
+  教育目的のデモリポジトリとして非常によく設計されています。意図的なバグを含むことで、学習者がClaude Codeの機能（Skills、Subagents）を実際に体験できる構成になっています。ドキュメントも充実しており、ブランチ構成が段階的学習に適しています。
+
+  依存関係管理の明示化があればより完璧ですが、現状でもウェビナーの目的には十分対応できる品質です。

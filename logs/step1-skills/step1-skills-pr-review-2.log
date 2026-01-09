@@ -1,0 +1,113 @@
+> The "pr-review" skill is running 
+
+⏺ このPRレビュースキルを実行します。まず、現在のブランチの変更内容を確認します。
+
+⏺ Bash(git status)
+  ⎿  On branch step1-skills                             
+     Changes to be committed:
+       (use "git restore --staged <file>..." to unstage)
+     … +11 lines (ctrl+o to expand)
+
+⏺ Bash(git diff --cached)
+  ⎿  diff --git a/.claude/skills/pr-review/SKILL.md b/.claude/skills/pr-review/SKILL.md
+     new file mode 100644
+     index 0000000..4629f1d
+     … +58 lines (ctrl+o to expand)
+
+⏺ Bash(git diff)
+  ⎿  diff --git a/README.md b/README.md
+     index 6a86d99..ace100d 100644
+     --- a/README.md
+     … +12 lines (ctrl+o to expand)
+
+⏺ 変更内容を確認しました。次に、メインブランチとの差分全体を確認します。
+
+⏺ Bash(git log --oneline main..HEAD)
+  ⎿  (No content)
+
+⏺ Bash(git diff main...HEAD)
+  ⎿  (No content)
+
+⏺ mainブランチとの差分がないようです。このブランチはmainから作成されたばかりのようです。現在のステージングエリアと未ステージングの変更をレビューします。
+
+⏺ Read(.claude/skills/pr-review/SKILL.md)
+  ⎿  Read 29 lines
+
+⏺ Read(.claude/skills/pr-review/checklist.md)
+  ⎿  Read 22 lines
+
+⏺ Read(README.md)
+  ⎿  Read 197 lines
+
+⏺ PRレビュー結果
+
+  1. 要約 (Summary)
+
+  このPRでは、Claude Code用のカスタムスキル「pr-review」を追加し、READMEにブランチ切り替え時の重要な注意事項を追記しています。
+
+  変更内容:
+  - .claude/skills/pr-review/SKILL.md: PRレビュー用スキルの定義（日本語出力、6セクション構成）
+  - .claude/skills/pr-review/checklist.md: レビュー観点のチェックリスト
+  - README.md: ブランチ切り替え後にClaude Codeの再起動が必要である旨を追記
+
+  目的:
+  - PRレビューの出力形式を標準化（要約、Must-fix、リスク、保守性、テスト、提案事項の6セクション）
+  - 毎回一貫した観点でレビューを実行
+  - ユーザーにスキルの動作条件を明示
+
+  2. Must-fix
+
+  なし
+
+  このPRにはブロッキング問題は見つかりませんでした。変更内容は適切に構造化されており、新規ファイルの追加とドキュメント更新のみです。
+
+  3. リスク / edge cases
+
+  低リスク
+
+  - スキルのロード失敗: user-invocable: true が設定されているため、/pr-review コマンドとして呼び出せる想定ですが、SKILL.mdの構文エラーがあるとロードされない可能性があります（現状の内容は問題なし）
+  - checklist.mdへの参照: SKILL.md:28で「詳細が必要な場合や変更が非自明な場合のみ checklist.md を参照する」と記載されていますが、相対パスでの参照がどのように動作するかはスキル実行時の環境に依存します
+  - 日本語出力の強制: SKILL.md:10で「必ず日本語で出力すること。」と指定していますが、Claude Codeが常にこれを遵守するかは実行時の動作に依存します（通常は問題なし）
+
+  4. 保守性 (Maintainability)
+
+  良い点
+
+  - 明確な構造: Frontmatterでスキルのメタデータとプロンプトを分離
+  - ツール制限: allowed-tools: Read, Grep, Glob でスキルが使用できるツールを制限し、予期しない動作を防止
+  - チェックリストの分離: レビュー観点を別ファイル（checklist.md）に分離し、必要に応じて参照する設計
+
+  改善提案
+
+  - README.md:22-24: 重要な注意事項が追加されており、ユーザー体験が向上しています。ただし、「再起動」の具体的な手順（CLI: Ctrl+C → 再起動、VSCode: ウィンドウリロードなど）を補足するとさらに親切です
+  - checklist.md:19: 「Test proves the bug is fixed?」という項目がありますが、このPRはスキル追加であり、バグ修正ではないため、将来的にこのチェックリストをより汎用的な表現に調整する余地があります（「テストは変更を検証しているか？」など）
+
+  5. テスト (Testing)
+
+  実行されたテスト
+
+  このPRレビュー実行時点では、以下を確認しました:
+  - ファイルの構文確認（SKILL.md, checklist.md のYAML frontmatter、Markdown構文）
+  - README.md の差分確認
+
+  推奨される追加テスト
+
+  1. スキルの動作確認:
+  git checkout step1-skills
+  # Claude Codeを再起動
+  /pr-review
+  1. → 6セクション（要約、Must-fix、リスク、保守性、テスト、提案事項）が日本語で出力されることを確認
+  2. checklist.md参照の動作確認: 複雑なコード変更に対して /pr-review を実行し、checklist.mdの内容が適切に参照されるか確認
+  3. ブランチ切り替え後の動作: README.md:22-24の注意事項通り、Claude Code再起動後にスキルが正しくロードされるか確認
+
+  6. 提案事項 (Suggested follow-ups)
+
+  任意の改善案
+
+  1. スキルの使用例追加: README.md の step1-skills セクション（64-98行目）に、実際の出力例を追加すると、ユーザーが期待する結果をより明確にイメージできます
+  2. checklist.mdの拡張: 将来的に、セキュリティ観点（OWASP、認証/認可、入力検証など）やパフォーマンス観点を追加することも検討できます
+  3. スキルのバージョン管理: frontmatterに version: 1.0.0 のようなフィールドを追加し、スキルの変更履歴を追跡しやすくする
+  4. エラーハンドリング: SKILL.mdに「レビュー対象がない場合の動作」（例: 変更なし、ステージング済みファイルなし）を明示すると、エッジケースでの動作が予測可能になります
+
+  ---
+  総評: このPRは、Claude Codeのカスタマイズ性を活用し、PRレビューの一貫性を高める良い変更です。構造が明確で、ドキュメントも適切に更新されています。上記の低リスク項目と提案事項は任意ですが、検討することでより堅牢なスキルになります。
